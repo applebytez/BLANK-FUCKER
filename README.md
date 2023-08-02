@@ -1,9 +1,9 @@
-# BLANK-GRABBER DUMPER
-A tool to dump webhooks from blanc grabber payloads to be able to spam and delete them
+# BLANK Fucker
+A tool to dump webhooks from blank grabber payloads to be able to spam and delete them
 
 # Currently supports commit 3ec3207 AND below!
 
-# What is blanc grabber?
+# What is blank grabber?
 Blanc grabber is a malicious tool used to be able to steal credentials of primarily discord users.
 Blanc grabber is advertised with the following beautiful features
 <img width="900" alt="image" src="https://github.com/uohefiuhgiufheuoiw/BLANC-DUMPER/assets/129020795/d129ecc6-6b1d-4f4e-82aa-a83eedd7288a">
