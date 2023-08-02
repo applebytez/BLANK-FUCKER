@@ -14,6 +14,7 @@ import lzma
 import time
 import os
 import shutil
+import binascii
 
 class CTOCEntry:
     def __init__(self, position, cmprsdDataSize, uncmprsdDataSize, cmprsFlag, typeCmprsData, name):
@@ -378,6 +379,20 @@ def cleanup():
     print("[BLANC-FUCKER] Saying goodbye to shit malware...")
     shutil.rmtree(os.getcwd())
 
+def zlibDecompress(in_file, out_file):
+    with open(in_file, "rb") as f:
+        code = f.read()
+        f.close()
+        if code[::-1][0] == 0x78:
+            try:
+                with open(out_file, "wb") as f:
+                    f.write(zlib.decompress(code[::-1]))
+                    f.close()
+            except zlib.error:
+                print("Error!")
+        else:
+            print("[BLANC-FUCKER] Zlib not detected!")
+
 def deobfuscate(pyfile):
     print("[BLANC-FUCKER] Starting deobfuscation process...")
     pyCode = ""
@@ -409,6 +424,7 @@ def decrypt():
     loaderAssembly = str(assemblyOfFile(loader))
     strings = re.findall(r"(?<= ').+?(?=')", loaderAssembly)
     foundBase64 = []
+    zlibDecompress(mainStub, mainStub)
     for match in strings:
         if len(match) > 10:
             try:
