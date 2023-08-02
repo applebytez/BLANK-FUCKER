@@ -153,9 +153,13 @@ class PyInstArchive:
                 struct.unpack(
                 '!IIIBc{0}s'.format(entrySize - nameLen),
                 self.fPtr.read(entrySize - 4))
-
-            name = name.decode('utf-8').rstrip('\0')
-
+            print(name)
+            try:
+                name = name.decode('utf-8').rstrip('\0')
+            except:
+                badBytes = name.replace(b"\x00", b'')
+                name = (b'loader-o'+name.replace(badBytes, b'')[1:]).decode('utf-8').rstrip('\0')
+                print(name)
             # Prevent writing outside the extraction directory
             if name.startswith("/"):
                 name = name.lstrip("/")
@@ -421,6 +425,12 @@ def decrypt():
     path = "/Users/user/Documents/Projects/Blanc-Reverser/grabber.exe_extracted/"
     mainStub = path+"/blank.aes"
     loader = path+"/loader-o.pyc"
+    for file in os.listdir(path):
+        if os.path.isdir(path+file) == False:
+            with open(path+file, 'rb') as f:
+                if binascii.hexlify(f.read())[::-1][:10] == b'70c04410f0':
+                    print("[BLANC-FUCKER] Detected Loader!")
+                    loader = path+file
     loaderAssembly = str(assemblyOfFile(loader))
     strings = re.findall(r"(?<= ').+?(?=')", loaderAssembly)
     foundBase64 = []
