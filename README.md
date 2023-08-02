@@ -1,4 +1,4 @@
-# BLANC-GRABBER DUMPER
+# BLANK-GRABBER DUMPER
 A tool to dump webhooks from blanc grabber payloads to be able to spam and delete them
 
 # Currently supports commit 3ec3207 AND below!
