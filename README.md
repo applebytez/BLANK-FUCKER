@@ -2,9 +2,9 @@
 A tool to dump webhooks from blank grabber payloads to be able to spam and delete them
 Currently supports commit **3ec3207** AND below!
 
-Dedicated to:__
-![image](https://github.com/applebytez/BLANK-FUCKER/assets/129020795/365acf2b-9aae-4b7f-84fe-df2b78992db0)__
-***My favorite new delhi python calculator new issue opener from new delhi, Aryan5555Github!!!***__
+Dedicated to:<br>
+![image](https://github.com/applebytez/BLANK-FUCKER/assets/129020795/365acf2b-9aae-4b7f-84fe-df2b78992db0)<br>
+***My favorite new delhi python calculator new issue opener from new delhi, Aryan5555Github!!!***<br>
 
 # What is blank grabber?
 Blanc grabber is a malicious tool used to be able to steal credentials of primarily discord users.
