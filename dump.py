@@ -51,7 +51,7 @@ class PyInstArchive:
             pass
 
     def checkFile(self):
-        print('[BLANC-FUCKER] Processing {0}'.format(self.filePath))
+        print('[BLANK-FUCKER] Processing {0}'.format(self.filePath))
 
         searchChunkSize = 8192
         endPos = self.fileSize
@@ -83,17 +83,17 @@ class PyInstArchive:
 
         if self.cookiePos == -1:
             print(
-                '[BLANC-FUCKER] Error : Missing cookie, unsupported pyinstaller version or not a pyinstaller archive')
+                '[BLANK-FUCKER] Error : Missing cookie, unsupported pyinstaller version or not a pyinstaller archive')
             return False
 
         self.fPtr.seek(self.cookiePos + self.PYINST20_COOKIE_SIZE, os.SEEK_SET)
 
         if b'python' in self.fPtr.read(64).lower():
-            print('[BLANC-FUCKER] Pyinstaller version: 2.1+')
+            print('[BLANK-FUCKER] Pyinstaller version: 2.1+')
             self.pyinstVer = 21     # pyinstaller 2.1+
         else:
             self.pyinstVer = 20     # pyinstaller 2.0
-            print('[BLANC-FUCKER] Pyinstaller version: 2.0')
+            print('[BLANK-FUCKER] Pyinstaller version: 2.0')
 
         return True
 
@@ -116,12 +116,12 @@ class PyInstArchive:
                         self.PYINST21_COOKIE_SIZE))
 
         except:
-            print('[BLANC-FUCKER] Error : The file is not a pyinstaller archive')
+            print('[BLANK-FUCKER] Error : The file is not a pyinstaller archive')
             return False
 
         self.pymaj, self.pymin = (pyver//100, pyver %
                                   100) if pyver >= 100 else (pyver//10, pyver % 10)
-        print('[BLANC-FUCKER] Python version: {0}.{1}'.format(self.pymaj, self.pymin))
+        print('[BLANK-FUCKER] Python version: {0}.{1}'.format(self.pymaj, self.pymin))
 
         # Additional data after the cookie
         tailBytes = self.fileSize - self.cookiePos - \
@@ -134,7 +134,7 @@ class PyInstArchive:
         self.tableOfContentsPos = self.overlayPos + toc
         self.tableOfContentsSize = tocLen
 
-        print('[BLANC-FUCKER] Length of package: {0} bytes'.format(lengthofPackage))
+        print('[BLANK-FUCKER] Length of package: {0} bytes'.format(lengthofPackage))
         return True
 
     def parseTOC(self):
@@ -167,7 +167,7 @@ class PyInstArchive:
             if len(name) == 0:
                 name = str(uniquename())
                 print(
-                    '[BLANC-FUCKER] Warning: Found an unamed file in CArchive. Using random name {0}'.format(name))
+                    '[BLANK-FUCKER] Warning: Found an unamed file in CArchive. Using random name {0}'.format(name))
 
             self.tocList.append(
                 CTOCEntry(
@@ -180,7 +180,7 @@ class PyInstArchive:
                 ))
 
             parsedLen += entrySize
-        print('[BLANC-FUCKER] Found {0} files in CArchive'.format(len(self.tocList)))
+        print('[BLANK-FUCKER] Found {0} files in CArchive'.format(len(self.tocList)))
 
     def _writeRawData(self, filepath, data):
         nm = filepath.replace('\\', os.path.sep).replace(
@@ -194,7 +194,7 @@ class PyInstArchive:
             f.write(data)
 
     def extractFiles(self):
-        print('[BLANC-FUCKER] Beginning extraction...please standby')
+        print('[BLANK-FUCKER] Beginning extraction...please standby')
         extractionDir = os.path.join(
             os.getcwd(), os.path.basename(self.filePath) + '_extracted')
 
@@ -212,7 +212,7 @@ class PyInstArchive:
                     data = zlib.decompress(data)
                 except zlib.error:
                     print(
-                        '[BLANC-FUCKER] Error : Failed to decompress {0}'.format(entry.name))
+                        '[BLANK-FUCKER] Error : Failed to decompress {0}'.format(entry.name))
                     continue
                 # Malware may tamper with the uncompressed size
                 # Comment out the assertion in such a case
@@ -233,7 +233,7 @@ class PyInstArchive:
             if entry.typeCmprsData == b's':
                 # s -> ARCHIVE_ITEM_PYSOURCE
                 # Entry point are expected to be python scripts
-                print('[BLANC-FUCKER] Possible entry point: {0}.pyc'.format(entry.name))
+                print('[BLANK-FUCKER] Possible entry point: {0}.pyc'.format(entry.name))
 
                 if self.pycMagic == b'\0' * 4:
                     # if we don't have the pyc header yet, fix them in a later pass
@@ -310,15 +310,15 @@ class PyInstArchive:
             elif self.pycMagic != pyzPycMagic:
                 self.pycMagic = pyzPycMagic
                 print(
-                    '[BLANC-FUCKER] Warning: pyc magic of files inside PYZ archive are different from those in CArchive')
+                    '[BLANK-FUCKER] Warning: pyc magic of files inside PYZ archive are different from those in CArchive')
 
             # Skip PYZ extraction if not running under the same python version
             if self.pymaj != sys.version_info.major or self.pymin != sys.version_info.minor:
                 print(
-                    '[BLANC-FUCKER] Warning: This script is running in a different Python version than the one used to build the executable.')
-                print('[BLANC-FUCKER] Please run this script in Python {0}.{1} to prevent extraction errors during unmarshalling'.format(
+                    '[BLANK-FUCKER] Warning: This script is running in a different Python version than the one used to build the executable.')
+                print('[BLANK-FUCKER] Please run this script in Python {0}.{1} to prevent extraction errors during unmarshalling'.format(
                     self.pymaj, self.pymin))
-                print('[BLANC-FUCKER] Skipping pyz extraction')
+                print('[BLANK-FUCKER] Skipping pyz extraction')
                 return
 
             (tocPosition, ) = struct.unpack('!i', f.read(4))
@@ -328,10 +328,10 @@ class PyInstArchive:
                 toc = marshal.load(f)
             except:
                 print(
-                    '[BLANC-FUCKER] Unmarshalling FAILED. Cannot extract {0}. Extracting remaining files.'.format(name))
+                    '[BLANK-FUCKER] Unmarshalling FAILED. Cannot extract {0}. Extracting remaining files.'.format(name))
                 return
 
-            print('[BLANC-FUCKER] Found {0} files in PYZ archive'.format(len(toc)))
+            print('[BLANK-FUCKER] Found {0} files in PYZ archive'.format(len(toc)))
 
             # From pyinstaller 3.1+ toc is a list of tuples
             if type(toc) == list:
@@ -366,7 +366,7 @@ class PyInstArchive:
                     data = f.read(length)
                     data = zlib.decompress(data)
                 except:
-                    print('[BLANC-FUCKER] Error: Failed to decompress {0}, probably encrypted. Extracting as is.'.format(
+                    print('[BLANK-FUCKER] Error: Failed to decompress {0}, probably encrypted. Extracting as is.'.format(
                         filePath))
                     open(filePath + '.encrypted', 'wb').write(data)
                 else:
@@ -380,7 +380,7 @@ def decryptAES(key, iv, ciphertext):
   return AESModeOfOperationGCM(key, iv).decrypt(ciphertext)
 
 def cleanup():
-    print("[BLANC-FUCKER] Saying goodbye to shit malware...")
+    print("[BLANK-FUCKER] Saying goodbye to shit malware...")
     shutil.rmtree(os.getcwd())
 
 def zlibDecompress(in_file, out_file):
@@ -395,10 +395,10 @@ def zlibDecompress(in_file, out_file):
             except zlib.error:
                 print("Error!")
         else:
-            print("[BLANC-FUCKER] Zlib not detected!")
+            print("[BLANK-FUCKER] Zlib not detected!")
 
 def deobfuscate(pyfile):
-    print("[BLANC-FUCKER] Starting deobfuscation process...")
+    print("[BLANK-FUCKER] Starting deobfuscation process...")
     pyCode = ""
     with open(pyfile, "r") as f:
         pyCode = f.read()
@@ -411,14 +411,17 @@ def deobfuscate(pyfile):
         f.write(asm)
     
     with open("dump.pyc", "rb") as f:
-        byteCode = f.read()
-        partialWebhook = re.findall(r"(?<=xa4aH)(.*?)(?==z)", str(byteCode))[0]
-        webhook = "aH"+partialWebhook+"="
-        write_path = os.path.abspath(os.path.join(os.getcwd(), '..'))
-        with open(write_path+"/we_gottem.hook", "w") as f:
-            f.write(str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
-            print("[BLANC-FUCKER] Webhook: "+str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
-        cleanup()
+        byteCode = str(f.read())
+        try:
+            webhook = re.findall(r"(?<=\\x00z\\xa.)(.*?)(?=z\\x..)", byteCode)[0]
+            write_path = os.path.abspath(os.path.join(os.getcwd(), '..'))
+            with open(write_path+"/we_gottem.hook", "w") as f:
+                f.write(str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
+                print("[BLANK-FUCKER] Webhook/Telegram Bot Token: "+str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
+            cleanup()
+        except:
+            print(byteCode)
+            print("[BLANK-FUCKER] Failed to find webhook, dump.pyc may be located in extracted folder for further examination!")
     
 
 def decrypt():
@@ -429,7 +432,7 @@ def decrypt():
         if os.path.isdir(path+file) == False:
             with open(path+file, 'rb') as f:
                 if binascii.hexlify(f.read())[::-1][:10] == b'70c04410f0':
-                    print("[BLANC-FUCKER] Detected Loader!")
+                    print("[BLANK-FUCKER] Detected Loader!")
                     loader = path+file
     loaderAssembly = str(assemblyOfFile(loader))
     strings = re.findall(r"(?<= ').+?(?=')", loaderAssembly)
@@ -442,9 +445,9 @@ def decrypt():
                 if string not in foundBase64:
                     foundBase64.append(string)
             except: 
-                print("[BLANC-FUCKER] Matching string is not key or IV!")
+                print("[BLANK-FUCKER] Matching string is not key or IV!")
     if len(foundBase64) < 2:
-        print("[BLANC-FUCKER] Could not find keys")
+        print("[BLANK-FUCKER] Could not find keys")
     else:
         key = ""
         iv = ""
@@ -472,9 +475,9 @@ def decrypt():
                         obj = lzma.LZMADecompressor()
                         with open("decrypted.py", "wb") as f:
                             f.write(obj.decompress(code))
-                        print("[BLANC-FUCKER] Ladies and gentleman....")
+                        print("[BLANK-FUCKER] Ladies and gentleman....")
                         time.sleep(1)
-                        print("[BLANC-FUCKER] We got him..")
+                        print("[BLANK-FUCKER] We got him..")
                         deobfuscate(path+"/decrypted.py")
                             
 
