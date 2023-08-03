@@ -15,7 +15,7 @@ import os
 import shutil
 import binascii
 
-filename = "./grabber.exe"
+filename = "grabber.exe"
 
 class bcolors:
     HEADER = '\033[95m'
@@ -381,26 +381,39 @@ def zlibDecompress(in_file, out_file):
                 print("[BLANK-FUCKER] Zlib Error!")
         else:
             print("[BLANK-FUCKER] Zlib not detected!")
-
-def deobfuscate(pyfile):
+            
+def deobfuscate(pyfile, preLoader=False, path=""):
     print("[BLANK-FUCKER]"+bcolors.WARNING+" Starting deobfuscation process..."+bcolors.ENDC)
     pyCode = ""
     with open(pyfile, "r") as f:
         pyCode = f.read()
+    if preLoader == True:
+        for name in os.listdir(path):
+            if name.endswith("pyc"):
+                os.remove(name)
+        print("[BLANK-FUCKER]"+bcolors.OKGREEN+" Pre-loader detected!"+bcolors.ENDC)
+        
     pyCode = pyCode.replace('__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 110, 86, 112, 98, 72, 82, 112, 98, 110, 77, 61])).decode()).exec(__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([98, 87, 70, 121, 99, 50, 104, 104, 98, 65, 61, 61])).decode()).loads(__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 109, 70, 122, 90, 84, 89, 48])).decode()).b64decode(__import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 50, 57, 107, 90, 87, 78, 122])).decode()).decode(____, __import__(getattr(__import__(bytes([98, 97, 115, 101, 54, 52]).decode()), bytes([98, 54, 52, 100, 101, 99, 111, 100, 101]).decode())(bytes([89, 109, 70, 122, 90, 84, 89, 48])).decode()).b64decode("cm90MTM=").decode())+_____+______[::-1]+_______)))', 'import importlib, sys;import base64;import codecs;import marshal;code = importlib._bootstrap_external._code_to_timestamp_pyc(marshal.dumps(base64.b64decode(codecs.decode(____, "rot13")+_____+______[::-1]+_______)));\nwith open("dump.pyc", "wb") as f:\n  f.write(code)')
     with open(pyfile, "w") as f:
         f.write(pyCode)
     result = subprocess.run(['python3', pyfile], stdout=subprocess.PIPE)
-    
     with open("dump.pyc", "rb") as f:
         byteCode = str(f.read())
         try:
-            webhook = re.findall(r"(?<=\\x00z\\xa.)(.*?)(?=z\\x..)", byteCode)[0]
+            webhook = ""
+            if preLoader == True:
+            	webhook = re.findall(r"(?<=config.jsonzy)(.*?)(?=\\xda)", byteCode)[0]
+            else:
+                webhook = re.findall(r"(?<=\\x00z\\xa.)(.*?)(?=z\\x..)", byteCode)[0]
             write_path = os.path.abspath(os.path.join(os.getcwd(), '..'))
             with open(write_path+"/we_gottem.hook", "w") as f:
                 try:
-                    f.write(str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
-                    print("[BLANK-FUCKER]"+bcolors.OKBLUE+" Webhook: "+str(base64.b64decode(webhook)).replace("b'", "").replace("'", "")+bcolors.ENDC)
+                    if preLoader == True:
+                        f.write(str(webhook).replace("b'", "").replace("'", ""))
+                        print("[BLANK-FUCKER]"+bcolors.OKBLUE+" Webhook: "+str(webhook).replace("b'", "").replace("'", "")+bcolors.ENDC)
+                    else:
+                    	f.write(str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
+                    	print("[BLANK-FUCKER]"+bcolors.OKBLUE+" Webhook: "+str(base64.b64decode(webhook)).replace("b'", "").replace("'", "")+bcolors.ENDC)
                 except:
                     f.write(str(webhook).replace("b'", "").replace("'", ""))
                     print("[BLANK-FUCKER]"+bcolors.OKBLUE+" Telegram Bot Token: "+str(webhook).replace("b'", "").replace("'", "")+bcolors.ENDC)
@@ -409,60 +422,77 @@ def deobfuscate(pyfile):
             print("[BLANK-FUCKER] Failed to find webhook, dump.pyc may be located in extracted folder for further examination!")
     
 
-def decrypt():
-    path = "/Users/user/Documents/Projects/Blanc-Reverser/"+filename+"_extracted/"
-    mainStub = path+"/blank.aes"
-    loader = path+"/loader-o.pyc"
-    for file in os.listdir(path):
-        if os.path.isdir(path+file) == False:
-            with open(path+file, 'rb') as f:
-                if binascii.hexlify(f.read())[::-1][:10] == b'70c04410f0':
-                    print("[BLANK-FUCKER]"+bcolors.OKGREEN+" Detected Loader!"+bcolors.ENDC)
-                    loader = path+file
-    loaderAssembly = str(assemblyOfFile(loader))
-    strings = re.findall(r"(?<= ').+?(?=')", loaderAssembly)
-    foundBase64 = []
-    zlibDecompress(mainStub, mainStub)
-    for match in strings:
-        if len(match) > 10:
-            try:
-                string = base64.b64decode(match)
-                if string not in foundBase64:
-                    foundBase64.append(string)
-            except: 
-                continue
-    if len(foundBase64) < 2:
-        print(bcolors.FAIL+"[BLANK-FUCKER] Could not find keys"+bcolors.ENDC)
-    else:
-        key = ""
-        iv = ""
-        if len(foundBase64[0]) > len(foundBase64[1]):
-            key = foundBase64[0]
-            iv = foundBase64[1]
-        else:
-            key = foundBase64[1]
-            iv = foundBase64[0]
-        if os.path.isfile(mainStub):
-            with open(mainStub, "rb") as f:
-                ciphertext = f.read()
-                decrypted = decryptAES(key, iv, ciphertext)
-                with open("stub.zip", "wb") as f:
-                    f.write(decrypted)
-                with ZipFile("stub.zip", 'r') as zObject:
-                    zObject.extractall()
-            stubAssembly = assemblyOfFile(path+"stub-o.pyc")
-            lines = stubAssembly.splitlines(keepends=False)
-            for line in lines:
-                if "LOAD_CONST" in str(line):
-                    possibleHex = re.sub(b"        [0-9][0-9][0-9][0-9]    LOAD_CONST                    [0-9]: ", b'', line)
-                    if len(possibleHex) > 200:
-                        code = eval(possibleHex)
-                        obj = lzma.LZMADecompressor()
-                        with open("decrypted.py", "wb") as f:
-                            f.write(obj.decompress(code))
-                        print("[BLANK-FUCKER]"+bcolors.WARNING+" Got LZMA file from bytecode"+bcolors.ENDC)
-                        deobfuscate(path+"/decrypted.py")
-                            
+def decrypt(extracted_name):
+	path = "/Users/user/Documents/Projects/Blanc-Reverser/"+extracted_name+"_extracted/"
+	mainStub = path+"/blank.aes"
+	preObscurity = os.path.exists(mainStub)
+	if preObscurity:
+		loader = path+"/loader-o.pyc"
+		for file in os.listdir(path):
+			if os.path.isdir(path+file) == False:
+				with open(path+file, 'rb') as f:
+					if binascii.hexlify(f.read())[::-1][:10] == b'70c04410f0':
+						print("[BLANK-FUCKER]"+bcolors.OKGREEN+" Detected Loader!"+bcolors.ENDC)
+						loader = path+file
+		loaderAssembly = str(assemblyOfFile(loader))
+		strings = re.findall(r"(?<= ').+?(?=')", loaderAssembly)
+		foundBase64 = []
+		zlibDecompress(mainStub, mainStub)
+		for match in strings:
+			if len(match) > 10:
+				try:
+					string = base64.b64decode(match)
+					if string not in foundBase64:
+						foundBase64.append(string)
+				except: 
+					continue
+		if len(foundBase64) < 2:
+			print(bcolors.FAIL+"[BLANK-FUCKER] Could not find keys"+bcolors.ENDC)
+		else:
+			key = ""
+			iv = ""
+			if len(foundBase64[0]) > len(foundBase64[1]):
+				key = foundBase64[0]
+				iv = foundBase64[1]
+			else:
+				key = foundBase64[1]
+				iv = foundBase64[0]
+			if os.path.isfile(mainStub):
+				with open(mainStub, "rb") as f:
+					ciphertext = f.read()
+					decrypted = decryptAES(key, iv, ciphertext)
+					with open("stub.zip", "wb") as f:
+						f.write(decrypted)
+					with ZipFile("stub.zip", 'r') as zObject:
+						zObject.extractall()
+				stubAssembly = assemblyOfFile(path+"stub-o.pyc")
+				lines = stubAssembly.splitlines(keepends=False)
+				for line in lines:
+					if "LOAD_CONST" in str(line):
+						possibleHex = re.sub(b"        [0-9][0-9][0-9][0-9]    LOAD_CONST                    [0-9]: ", b'', line)
+						if len(possibleHex) > 200:
+							code = eval(possibleHex)
+							obj = lzma.LZMADecompressor()
+							with open("decrypted.py", "wb") as f:
+								f.write(obj.decompress(code))
+								print("[BLANK-FUCKER]"+bcolors.WARNING+" Got LZMA file from bytecode"+bcolors.ENDC)
+								f.close()
+							deobfuscate(path+"decrypted.py", preLoader=False, path=path)
+	else:
+		print("[BLANK-FUCKER]"+bcolors.WARNING+" Payload seems to be an older version of blank grabber, attempting older methods.."+bcolors.ENDC)
+		stubAssembly = assemblyOfFile(path+"main-o.pyc")
+		lines = stubAssembly.splitlines(keepends=False)
+		for line in lines:
+			if "LOAD_CONST" in str(line):
+				possibleHex = re.sub(b"    [0-9][0-9][0-9]     LOAD_CONST                    [0-9]: ", b'', line)
+				if len(possibleHex) > 200:
+					code = eval(possibleHex)
+					obj = lzma.LZMADecompressor()
+					with open("decrypted.py", "wb") as f:
+						f.write(obj.decompress(code))
+						print("[BLANK-FUCKER]"+bcolors.WARNING+" Got LZMA file from bytecode"+bcolors.ENDC)
+						f.close()
+					deobfuscate(path+"decrypted.py", preLoader=True, path=path)
 
 def main():
     print("""
@@ -474,7 +504,7 @@ def main():
     ╰━━━┻━━━┻╯╱╰┻╯╱╰━┻╯╰━╯╱╰╯╱╱╰━━━┻━━━┻╯╰━┻━━━┻╯╰━╯""")
     # get first argument
     if len(sys.argv) > 1:
-        filename = "./"+sys.argv[1]
+        filename = sys.argv[1]
     else:
         filename = input("[BLANK-FUCKER]"+bcolors.OKBLUE+" Please input file name: "+bcolors.ENDC)
     arch = PyInstArchive("./"+filename)
@@ -484,7 +514,7 @@ def main():
 	    		arch.parseTOC()
 	    		arch.extractFiles()
 	    		arch.close()
-	    		decrypt()
+	    		decrypt(filename)
     arch.close()
 
 
