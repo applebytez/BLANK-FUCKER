@@ -11,7 +11,6 @@ import base64
 from pyaes import AESModeOfOperationGCM
 from zipfile import ZipFile
 import lzma
-import time
 import os
 import shutil
 import binascii
@@ -234,8 +233,6 @@ class PyInstArchive:
             if entry.typeCmprsData == b's':
                 # s -> ARCHIVE_ITEM_PYSOURCE
                 # Entry point are expected to be python scripts
-                print('[BLANK-FUCKER] Possible entry point: {0}.pyc'.format(entry.name))
-
                 if self.pycMagic == b'\0' * 4:
                     # if we don't have the pyc header yet, fix them in a later pass
                     self.barePycList.append(entry.name + '.pyc')
@@ -368,7 +365,7 @@ def decryptAES(key, iv, ciphertext):
   return AESModeOfOperationGCM(key, iv).decrypt(ciphertext)
 
 def cleanup():
-    print("[BLANK-FUCKER] Saying goodbye to shit malware...")
+    print("[BLANK-FUCKER]"+bcolors.FAIL+bcolors.UNDERLINE+" Saying goodbye to shit malware..."+bcolors.ENDC)
     shutil.rmtree(os.getcwd())
 
 def zlibDecompress(in_file, out_file):
@@ -386,7 +383,7 @@ def zlibDecompress(in_file, out_file):
             print("[BLANK-FUCKER] Zlib not detected!")
 
 def deobfuscate(pyfile):
-    print("[BLANK-FUCKER] Starting deobfuscation process...")
+    print("[BLANK-FUCKER]"+bcolors.WARNING+" Starting deobfuscation process..."+bcolors.ENDC)
     pyCode = ""
     with open(pyfile, "r") as f:
         pyCode = f.read()
@@ -394,9 +391,6 @@ def deobfuscate(pyfile):
     with open(pyfile, "w") as f:
         f.write(pyCode)
     result = subprocess.run(['python3', pyfile], stdout=subprocess.PIPE)
-    asm = assemblyOfFile("dump.pyc")
-    with open('asm.txt', 'wb') as f:
-        f.write(asm)
     
     with open("dump.pyc", "rb") as f:
         byteCode = str(f.read())
@@ -406,10 +400,10 @@ def deobfuscate(pyfile):
             with open(write_path+"/we_gottem.hook", "w") as f:
                 try:
                     f.write(str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
-                    print(bcolors.OKBLUE+"[BLANK-FUCKER] Webhook: "+str(base64.b64decode(webhook)).replace("b'", "").replace("'", "")+bcolors.ENDC)
+                    print("[BLANK-FUCKER]"+bcolors.OKBLUE+" Webhook: "+str(base64.b64decode(webhook)).replace("b'", "").replace("'", "")+bcolors.ENDC)
                 except:
                     f.write(str(webhook).replace("b'", "").replace("'", ""))
-                    print(bcolors.OKBLUE+"[BLANK-FUCKER] Telegram Bot Token: "+str(webhook).replace("b'", "").replace("'", "")+bcolors.ENDC)
+                    print("[BLANK-FUCKER]"+bcolors.OKBLUE+" Telegram Bot Token: "+str(webhook).replace("b'", "").replace("'", "")+bcolors.ENDC)
             cleanup()
         except:
             print("[BLANK-FUCKER] Failed to find webhook, dump.pyc may be located in extracted folder for further examination!")
@@ -423,7 +417,7 @@ def decrypt():
         if os.path.isdir(path+file) == False:
             with open(path+file, 'rb') as f:
                 if binascii.hexlify(f.read())[::-1][:10] == b'70c04410f0':
-                    print("[BLANK-FUCKER] Detected Loader!")
+                    print("[BLANK-FUCKER]"+bcolors.OKGREEN+" Detected Loader!"+bcolors.ENDC)
                     loader = path+file
     loaderAssembly = str(assemblyOfFile(loader))
     strings = re.findall(r"(?<= ').+?(?=')", loaderAssembly)
@@ -436,9 +430,9 @@ def decrypt():
                 if string not in foundBase64:
                     foundBase64.append(string)
             except: 
-                print("[BLANK-FUCKER] Matching string is not key or IV!")
+                continue
     if len(foundBase64) < 2:
-        print("[BLANK-FUCKER] Could not find keys")
+        print(bcolors.FAIL+"[BLANK-FUCKER] Could not find keys"+bcolors.ENDC)
     else:
         key = ""
         iv = ""
@@ -466,9 +460,7 @@ def decrypt():
                         obj = lzma.LZMADecompressor()
                         with open("decrypted.py", "wb") as f:
                             f.write(obj.decompress(code))
-                        print(bcolors.WARNING+"[BLANK-FUCKER] Ladies and gentleman...."+bcolors.ENDC)
-                        time.sleep(1)
-                        print(bcolors.OKGREEN+"[BLANK-FUCKER] We got him.."+bcolors.ENDC)
+                        print("[BLANK-FUCKER]"+bcolors.WARNING+" Got LZMA file from bytecode"+bcolors.ENDC)
                         deobfuscate(path+"/decrypted.py")
                             
 
@@ -484,7 +476,7 @@ def main():
     if len(sys.argv) > 1:
         filename = "./"+sys.argv[1]
     else:
-        filename = input(bcolors.OKBLUE+"[BLANK-FUCKER] Please input file name: "+bcolors.ENDC)
+        filename = input("[BLANK-FUCKER]"+bcolors.OKBLUE+" Please input file name: "+bcolors.ENDC)
     arch = PyInstArchive("./"+filename)
     if arch.open():
     	if arch.checkFile():
