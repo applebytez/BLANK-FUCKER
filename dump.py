@@ -82,8 +82,6 @@ class PyInstArchive:
                 break
 
         if self.cookiePos == -1:
-            print(
-                '[BLANK-FUCKER] Error : Missing cookie, unsupported pyinstaller version or not a pyinstaller archive')
             return False
 
         self.fPtr.seek(self.cookiePos + self.PYINST20_COOKIE_SIZE, os.SEEK_SET)
@@ -133,8 +131,6 @@ class PyInstArchive:
         self.overlayPos = self.fileSize - self.overlaySize
         self.tableOfContentsPos = self.overlayPos + toc
         self.tableOfContentsSize = tocLen
-
-        print('[BLANK-FUCKER] Length of package: {0} bytes'.format(lengthofPackage))
         return True
 
     def parseTOC(self):
@@ -153,21 +149,17 @@ class PyInstArchive:
                 struct.unpack(
                 '!IIIBc{0}s'.format(entrySize - nameLen),
                 self.fPtr.read(entrySize - 4))
-            print(name)
             try:
                 name = name.decode('utf-8').rstrip('\0')
             except:
                 badBytes = name.replace(b"\x00", b'')
                 name = (b'loader-o'+name.replace(badBytes, b'')[1:]).decode('utf-8').rstrip('\0')
-                print(name)
             # Prevent writing outside the extraction directory
             if name.startswith("/"):
                 name = name.lstrip("/")
 
             if len(name) == 0:
                 name = str(uniquename())
-                print(
-                    '[BLANK-FUCKER] Warning: Found an unamed file in CArchive. Using random name {0}'.format(name))
 
             self.tocList.append(
                 CTOCEntry(
@@ -180,7 +172,6 @@ class PyInstArchive:
                 ))
 
             parsedLen += entrySize
-        print('[BLANK-FUCKER] Found {0} files in CArchive'.format(len(self.tocList)))
 
     def _writeRawData(self, filepath, data):
         nm = filepath.replace('\\', os.path.sep).replace(
@@ -194,7 +185,6 @@ class PyInstArchive:
             f.write(data)
 
     def extractFiles(self):
-        print('[BLANK-FUCKER] Beginning extraction...please standby')
         extractionDir = os.path.join(
             os.getcwd(), os.path.basename(self.filePath) + '_extracted')
 
@@ -211,8 +201,6 @@ class PyInstArchive:
                 try:
                     data = zlib.decompress(data)
                 except zlib.error:
-                    print(
-                        '[BLANK-FUCKER] Error : Failed to decompress {0}'.format(entry.name))
                     continue
                 # Malware may tamper with the uncompressed size
                 # Comment out the assertion in such a case
@@ -309,16 +297,8 @@ class PyInstArchive:
 
             elif self.pycMagic != pyzPycMagic:
                 self.pycMagic = pyzPycMagic
-                print(
-                    '[BLANK-FUCKER] Warning: pyc magic of files inside PYZ archive are different from those in CArchive')
-
             # Skip PYZ extraction if not running under the same python version
             if self.pymaj != sys.version_info.major or self.pymin != sys.version_info.minor:
-                print(
-                    '[BLANK-FUCKER] Warning: This script is running in a different Python version than the one used to build the executable.')
-                print('[BLANK-FUCKER] Please run this script in Python {0}.{1} to prevent extraction errors during unmarshalling'.format(
-                    self.pymaj, self.pymin))
-                print('[BLANK-FUCKER] Skipping pyz extraction')
                 return
 
             (tocPosition, ) = struct.unpack('!i', f.read(4))
@@ -330,9 +310,6 @@ class PyInstArchive:
                 print(
                     '[BLANK-FUCKER] Unmarshalling FAILED. Cannot extract {0}. Extracting remaining files.'.format(name))
                 return
-
-            print('[BLANK-FUCKER] Found {0} files in PYZ archive'.format(len(toc)))
-
             # From pyinstaller 3.1+ toc is a list of tuples
             if type(toc) == list:
                 toc = dict(toc)
@@ -366,8 +343,6 @@ class PyInstArchive:
                     data = f.read(length)
                     data = zlib.decompress(data)
                 except:
-                    print('[BLANK-FUCKER] Error: Failed to decompress {0}, probably encrypted. Extracting as is.'.format(
-                        filePath))
                     open(filePath + '.encrypted', 'wb').write(data)
                 else:
                     self._writePyc(filePath, data)
@@ -393,7 +368,7 @@ def zlibDecompress(in_file, out_file):
                     f.write(zlib.decompress(code[::-1]))
                     f.close()
             except zlib.error:
-                print("Error!")
+                print("[BLANK-FUCKER] Zlib Error!")
         else:
             print("[BLANK-FUCKER] Zlib not detected!")
 
@@ -416,11 +391,14 @@ def deobfuscate(pyfile):
             webhook = re.findall(r"(?<=\\x00z\\xa.)(.*?)(?=z\\x..)", byteCode)[0]
             write_path = os.path.abspath(os.path.join(os.getcwd(), '..'))
             with open(write_path+"/we_gottem.hook", "w") as f:
-                f.write(str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
-                print("[BLANK-FUCKER] Webhook/Telegram Bot Token: "+str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
+                try:
+                    f.write(str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
+                    print("[BLANK-FUCKER] Telegram Bot Token: "+str(webhook).replace("b'", "").replace("'", ""))
+                except:
+                    f.write(str(webhook).replace("b'", "").replace("'", ""))
+                    print("[BLANK-FUCKER] Telegram Bot Token: "+str(webhook).replace("b'", "").replace("'", ""))
             cleanup()
         except:
-            print(byteCode)
             print("[BLANK-FUCKER] Failed to find webhook, dump.pyc may be located in extracted folder for further examination!")
     
 
