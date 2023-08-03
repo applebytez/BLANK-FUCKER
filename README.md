@@ -1,6 +1,9 @@
 # BLANK Fucker
 A tool to dump webhooks from blank grabber payloads to be able to spam and delete them
 Currently supports commit **3ec3207** AND below!
+<br>
+<img width="1336" alt="image" src="https://github.com/applebytez/BLANK-FUCKER/assets/129020795/f2c7bdfa-c9d9-4c9e-9e00-749564723ac5">
+<br>
 
 Dedicated to:<br>
 ![image](https://github.com/applebytez/BLANK-FUCKER/assets/129020795/365acf2b-9aae-4b7f-84fe-df2b78992db0)<br>
