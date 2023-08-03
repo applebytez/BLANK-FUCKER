@@ -16,6 +16,19 @@ import os
 import shutil
 import binascii
 
+filename = "./grabber.exe"
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 class CTOCEntry:
     def __init__(self, position, cmprsdDataSize, uncmprsdDataSize, cmprsFlag, typeCmprsData, name):
         self.position = position
@@ -393,17 +406,17 @@ def deobfuscate(pyfile):
             with open(write_path+"/we_gottem.hook", "w") as f:
                 try:
                     f.write(str(base64.b64decode(webhook)).replace("b'", "").replace("'", ""))
-                    print("[BLANK-FUCKER] Telegram Bot Token: "+str(webhook).replace("b'", "").replace("'", ""))
+                    print(bcolors.OKBLUE+"[BLANK-FUCKER] Webhook: "+str(base64.b64decode(webhook)).replace("b'", "").replace("'", "")+bcolors.ENDC)
                 except:
                     f.write(str(webhook).replace("b'", "").replace("'", ""))
-                    print("[BLANK-FUCKER] Telegram Bot Token: "+str(webhook).replace("b'", "").replace("'", ""))
+                    print(bcolors.OKBLUE+"[BLANK-FUCKER] Telegram Bot Token: "+str(webhook).replace("b'", "").replace("'", "")+bcolors.ENDC)
             cleanup()
         except:
             print("[BLANK-FUCKER] Failed to find webhook, dump.pyc may be located in extracted folder for further examination!")
     
 
 def decrypt():
-    path = "/Users/user/Documents/Projects/Blanc-Reverser/grabber.exe_extracted/"
+    path = "/Users/user/Documents/Projects/Blanc-Reverser/"+filename+"_extracted/"
     mainStub = path+"/blank.aes"
     loader = path+"/loader-o.pyc"
     for file in os.listdir(path):
@@ -453,23 +466,34 @@ def decrypt():
                         obj = lzma.LZMADecompressor()
                         with open("decrypted.py", "wb") as f:
                             f.write(obj.decompress(code))
-                        print("[BLANK-FUCKER] Ladies and gentleman....")
+                        print(bcolors.WARNING+"[BLANK-FUCKER] Ladies and gentleman...."+bcolors.ENDC)
                         time.sleep(1)
-                        print("[BLANK-FUCKER] We got him..")
+                        print(bcolors.OKGREEN+"[BLANK-FUCKER] We got him.."+bcolors.ENDC)
                         deobfuscate(path+"/decrypted.py")
                             
 
 def main():
-	print("Decrypting")
-	arch = PyInstArchive("./grabber.exe")
-	if arch.open():
-		if arch.checkFile():
-			if arch.getCArchiveInfo():
-				arch.parseTOC()
-				arch.extractFiles()
-				arch.close()
-				decrypt()
-	arch.close()
+    print("""
+    ╭━━╮╭╮╱╱╭━━━┳━╮╱╭┳╮╭━╮╱╭━━━┳╮╱╭┳━━━┳╮╭━┳━━━┳━━━╮
+    ┃╭╮┃┃┃╱╱┃╭━╮┃┃╰╮┃┃┃┃╭╯╱┃╭━━┫┃╱┃┃╭━╮┃┃┃╭┫╭━━┫╭━╮┃
+    ┃╰╯╰┫┃╱╱┃┃╱┃┃╭╮╰╯┃╰╯╯╱╱┃╰━━┫┃╱┃┃┃╱╰┫╰╯╯┃╰━━┫╰━╯┃
+    ┃╭━╮┃┃╱╭┫╰━╯┃┃╰╮┃┃╭╮┣━━┫╭━━┫┃╱┃┃┃╱╭┫╭╮┃┃╭━━┫╭╮╭╯
+    ┃╰━╯┃╰━╯┃╭━╮┃┃╱┃┃┃┃┃╰┳━┫┃╱╱┃╰━╯┃╰━╯┃┃┃╰┫╰━━┫┃┃╰╮
+    ╰━━━┻━━━┻╯╱╰┻╯╱╰━┻╯╰━╯╱╰╯╱╱╰━━━┻━━━┻╯╰━┻━━━┻╯╰━╯""")
+    # get first argument
+    if len(sys.argv) > 1:
+        filename = "./"+sys.argv[1]
+    else:
+        filename = input(bcolors.OKBLUE+"[BLANK-FUCKER] Please input file name: "+bcolors.ENDC)
+    arch = PyInstArchive("./"+filename)
+    if arch.open():
+    	if arch.checkFile():
+	    	if arch.getCArchiveInfo():
+	    		arch.parseTOC()
+	    		arch.extractFiles()
+	    		arch.close()
+	    		decrypt()
+    arch.close()
 
 
 if __name__ == '__main__':
