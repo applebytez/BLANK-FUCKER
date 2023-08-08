@@ -1,7 +1,7 @@
 # BLANK Fucker
-A tool to dump webhooks from blank grabber payloads to be able to spam and delete them
-As of August 8, 2023... supports ALL versions of blank grabber.
-<br>
+A tool to dump webhooks from blank grabber payloads to be able to spam and delete them<br><br>
+**As of August 8, 2023... supports ALL versions of blank grabber.**
+<br><br>
 <img width="1336" alt="image" src="https://github.com/applebytez/BLANK-FUCKER/assets/129020795/f2c7bdfa-c9d9-4c9e-9e00-749564723ac5">
 <br>
 
