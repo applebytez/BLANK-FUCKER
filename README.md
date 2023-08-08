@@ -1,6 +1,6 @@
 # BLANK Fucker
 A tool to dump webhooks from blank grabber payloads to be able to spam and delete them
-Currently supports commit **3ec3207** AND below!
+As of August 8, 2023... supports ALL versions of blank grabber.
 <br>
 <img width="1336" alt="image" src="https://github.com/applebytez/BLANK-FUCKER/assets/129020795/f2c7bdfa-c9d9-4c9e-9e00-749564723ac5">
 <br>
@@ -10,8 +10,8 @@ Dedicated to:<br>
 ***My favorite new delhi python calculator new issue opener from Dhanbad, Aryan5555Github!!!***<br>
 
 # What is blank grabber?
-Blanc grabber is a malicious tool used to be able to steal credentials of primarily discord users.
-Blanc grabber is advertised with the following beautiful features
+Blank grabber is a malicious tool used to be able to steal credentials of primarily discord users.
+Blank grabber is advertised with the following beautiful features
 <img width="900" alt="image" src="https://github.com/uohefiuhgiufheuoiw/BLANC-DUMPER/assets/129020795/d129ecc6-6b1d-4f4e-82aa-a83eedd7288a">
 Now these don't seem very nice to me..
 
