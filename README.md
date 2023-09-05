@@ -1,6 +1,10 @@
 # BLANK Fucker
 A tool to dump webhooks from blank grabber payloads to be able to spam and delete them<br><br>
-**As of August 8, 2023... supports ALL versions of blank grabber.**
+**As of September 5, 2023... supports ALL versions of blank grabber.**
+
+# This project is now closed
+Since blank grabber has died, we have also stopped supporting it. The new 'owner' is an even bigger script kiddie who can't write a single function or feature or any sort of bypass against our tool. Safe to say, we will probably not need to make a single change to support blank grabber for a while. 
+
 <br><br>
 <img width="1336" alt="image" src="https://github.com/applebytez/BLANK-FUCKER/assets/129020795/f2c7bdfa-c9d9-4c9e-9e00-749564723ac5">
 <br>
