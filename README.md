@@ -5,6 +5,8 @@ A tool to dump webhooks from blank grabber payloads to be able to spam and delet
 # This project is now closed
 Since blank grabber has died, we have also stopped supporting it. The new 'owner' is an even bigger script kiddie who can't write a single function or feature or any sort of bypass against our tool. Safe to say, we will probably not need to make a single change to support blank grabber for a while. 
 
+**I am keeping it un-archived incase ANY retards who currently work on blank grabber think of fucking about.**
+
 <br><br>
 <img width="1336" alt="image" src="https://github.com/applebytez/BLANK-FUCKER/assets/129020795/f2c7bdfa-c9d9-4c9e-9e00-749564723ac5">
 <br>
